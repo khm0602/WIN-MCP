@@ -48,7 +48,7 @@ class ControlConfig:
     idle_timeout_seconds: float = 10.0
     policy: str = "relaxed"
     # Countdown before AI starts a new control period; 0 disables the prompt.
-    consent_countdown_seconds: int = 10
+    consent_countdown_seconds: int = 0  # ko: prompt off by default
 
 
 @dataclass

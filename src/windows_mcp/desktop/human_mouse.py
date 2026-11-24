@@ -175,18 +175,18 @@ def key_gaps(text: str, rng: random.Random | None = None) -> list[float]:
     gaps: list[float] = []
     burst = 0
     for i, ch in enumerate(text):
-        gap = rng.lognormvariate(math.log(0.085), 0.35)
+        gap = rng.lognormvariate(math.log(0.03), 0.35)
         burst += 1
         if burst >= rng.randint(4, 9):  # a quick run of keys, then a beat
-            gap *= rng.uniform(1.3, 2.0)
+            gap *= rng.uniform(1.3, 1.8)
             burst = 0
         if ch == " ":
-            gap *= rng.uniform(1.1, 1.6)
+            gap *= rng.uniform(1.05, 1.35)
         elif ch in _PUNCT or ch == "\n":
-            gap += rng.uniform(0.15, 0.45)
-        if i + 1 < len(text) and rng.random() < 0.025:  # brief hesitation
-            gap += rng.uniform(0.25, 0.7)
-        gaps.append(min(1.2, max(0.03, gap)))
+            gap += rng.uniform(0.05, 0.15)
+        if i + 1 < len(text) and rng.random() < 0.01:  # brief hesitation
+            gap += rng.uniform(0.1, 0.3)
+        gaps.append(min(0.45, max(0.012, gap)))
     return gaps
 
 
