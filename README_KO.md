@@ -15,9 +15,9 @@ powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 # 2) 설치 (원본을 깔았다면 먼저: uv tool uninstall windows-mcp)
 uv tool install git+https://github.com/khm0602/windows-mcp-ko
 # 3) Claude Code 등록 (끝의 serve 필수)
-claude mcp add windows-mcp -s user -e ANONYMIZED_TELEMETRY=false -- "$env:USERPROFILE\.local\bin\windows-mcp-ko.exe" serve
+claude mcp add WIN-MCP -s user -e ANONYMIZED_TELEMETRY=false -- "$env:USERPROFILE\.local\bin\windows-mcp-ko.exe" serve
 ```
-Claude Code를 다시 켜고 `/mcp`에서 `windows-mcp`가 connected인지 확인.
+Claude Code를 다시 켜고 `/mcp`에서 `WIN-MCP`가 connected인지 확인.
 
 업데이트: `uv tool upgrade windows-mcp-ko`
 
