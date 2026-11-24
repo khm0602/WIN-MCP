@@ -805,6 +805,14 @@ class Desktop:
         except Exception:
             return ""
 
+    def _clamp_to_screen(self, x: int, y: int, fallback: tuple[int, int]) -> tuple[int, int]:
+        """Keep a jittered point on the desktop; fall back to the exact target if not."""
+        try:
+            self._validate_screen_point(x, y)
+            return x, y
+        except Exception:
+            return fallback
+
     def _glide(self, x: int, y: int, duration: float | None = None, overshoot: bool = True) -> bool:
         """Move the cursor to (x, y) like a hand would. Returns False when disabled."""
         if not human_mouse.enabled():
@@ -834,6 +842,8 @@ class Desktop:
             if not self._glide(x, y):
                 uia.SetCursorPos(x, y)
             return ""
+        if human_mouse.enabled():
+            x, y = self._clamp_to_screen(*human_mouse.jitter_point(x, y), fallback=(x, y))
         self._glide(x, y)
         # Ask before clicking: a click that opens its own dialog must not look blocked.
         blocked = self._modal_dialog_warning(x, y)
@@ -848,7 +858,14 @@ class Desktop:
                         owner.record_step_current()
                 else:
                     owner.checkpoint_current()
-                    uia.Click(x, y)
+                    if human_mouse.enabled():
+                        uia.SetCursorPos(x, y)
+                        uia.AbsoluteMouseEvent(uia.MouseEventFlag.LeftDown, x, y)
+                        sleep(human_mouse.click_hold())
+                        uia.AbsoluteMouseEvent(uia.MouseEventFlag.LeftUp, x, y)
+                        sleep(0.5)
+                    else:
+                        uia.Click(x, y)
                     owner.record_step_current()
             case "right":
                 for _ in range(clicks):
@@ -891,7 +908,16 @@ class Desktop:
         owner.checkpoint_current()
         x, y = loc
         self._validate_screen_point(x, y)
-        uia.Click(x, y)
+        if human_mouse.enabled():
+            cx, cy = self._clamp_to_screen(*human_mouse.jitter_point(x, y, limit=3), fallback=(x, y))
+            self._glide(cx, cy)
+            uia.SetCursorPos(cx, cy)
+            uia.AbsoluteMouseEvent(uia.MouseEventFlag.LeftDown, cx, cy)
+            sleep(human_mouse.click_hold())
+            uia.AbsoluteMouseEvent(uia.MouseEventFlag.LeftUp, cx, cy)
+            sleep(0.5)
+        else:
+            uia.Click(x, y)
         owner.record_step_current()
         if caret_position in ("start", "end"):
             key = "{Home}" if caret_position == "start" else "{End}"
@@ -914,8 +940,16 @@ class Desktop:
         # Per-key SendKeys for short text (so escape sequences keep working);
         # clipboard paste for long text (so the scan-code queue can't race).
         has_control_chars = any(c in text for c in ("\n", "\t", "{", "}"))
-        if len(text) >= self._LONG_TEXT_PASTE_THRESHOLD and not has_control_chars:
+        human = human_mouse.enabled()
+        paste_at = human_mouse.HUMAN_TYPE_MAX_CHARS if human else self._LONG_TEXT_PASTE_THRESHOLD
+        if len(text) >= paste_at and not has_control_chars:
             self._paste_text(text)
+        elif human:
+            for ch, gap in zip(text, human_mouse.key_gaps(text)):
+                owner.checkpoint_current()
+                uia.SendKeys(_escape_text_for_sendkeys(ch), interval=0.01, waitTime=0)
+                owner.record_step_current()
+                sleep(gap)
         else:
             # Bump interval from 0.02 → 0.04. Keeps short-text speed acceptable
             # while reducing key-loss; each character is a cancellation point.
@@ -1186,6 +1220,7 @@ class Desktop:
             raise ValueError("wheel_times must be 1 or more")
         if loc:
             self.move(loc)
+        gaps = human_mouse.scroll_gaps(wheel_times) if human_mouse.enabled() else []
         match type:
             case "vertical":
                 match direction:
@@ -1194,11 +1229,15 @@ class Desktop:
                             owner.checkpoint_current()
                             uia.WheelUp(1)
                             owner.record_step_current()
+                            if gaps:
+                                sleep(gaps.pop(0))
                     case "down":
                         for _ in range(wheel_times):
                             owner.checkpoint_current()
                             uia.WheelDown(1)
                             owner.record_step_current()
+                            if gaps:
+                                sleep(gaps.pop(0))
             case "horizontal":
                 match direction:
                     case "left":
@@ -1213,6 +1252,8 @@ class Desktop:
                                 owner.checkpoint_current()
                                 uia.WheelUp(1)
                                 owner.record_step_current()
+                                if gaps:
+                                    sleep(gaps.pop(0))
                         finally:
                             owner.input_ledger.release("key:shift")
                     case "right":
@@ -1227,6 +1268,8 @@ class Desktop:
                                 owner.checkpoint_current()
                                 uia.WheelDown(1)
                                 owner.record_step_current()
+                                if gaps:
+                                    sleep(gaps.pop(0))
                         finally:
                             owner.input_ledger.release("key:shift")
 

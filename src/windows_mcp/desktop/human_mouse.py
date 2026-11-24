@@ -144,3 +144,62 @@ def glide(
             after_step()
         if wait > 0:
             sleeper(wait)
+
+
+# --- clicks, typing and scrolling -------------------------------------------
+
+_PUNCT = set(".,!?;:)]}。，！？")
+
+# Text longer than this is still pasted even in human mode, so a long document
+# does not take minutes to "type".
+HUMAN_TYPE_MAX_CHARS = 300
+
+
+def jitter_point(x: int, y: int, rng: random.Random | None = None, limit: int = 4) -> Point:
+    """Land a few pixels off the exact target, as a hand does (never more than *limit*)."""
+    rng = rng or random.Random()
+    dx = max(-limit, min(limit, round(rng.gauss(0, limit / 2.2))))
+    dy = max(-limit, min(limit, round(rng.gauss(0, limit / 2.2))))
+    return x + dx, y + dy
+
+
+def click_hold(rng: random.Random | None = None) -> float:
+    """How long the button stays down for one click (roughly 60-140 ms)."""
+    rng = rng or random.Random()
+    return min(0.16, max(0.05, rng.lognormvariate(math.log(0.085), 0.25)))
+
+
+def key_gaps(text: str, rng: random.Random | None = None) -> list[float]:
+    """Seconds to wait after each character: uneven rhythm, pauses at words/sentences."""
+    rng = rng or random.Random()
+    gaps: list[float] = []
+    burst = 0
+    for i, ch in enumerate(text):
+        gap = rng.lognormvariate(math.log(0.085), 0.35)
+        burst += 1
+        if burst >= rng.randint(4, 9):  # a quick run of keys, then a beat
+            gap *= rng.uniform(1.3, 2.0)
+            burst = 0
+        if ch == " ":
+            gap *= rng.uniform(1.1, 1.6)
+        elif ch in _PUNCT or ch == "\n":
+            gap += rng.uniform(0.15, 0.45)
+        if i + 1 < len(text) and rng.random() < 0.025:  # brief hesitation
+            gap += rng.uniform(0.25, 0.7)
+        gaps.append(min(1.2, max(0.03, gap)))
+    return gaps
+
+
+def scroll_gaps(notches: int, rng: random.Random | None = None) -> list[float]:
+    """Seconds to wait after each wheel notch: quick flicks of 2-5 notches, then a pause."""
+    rng = rng or random.Random()
+    gaps: list[float] = []
+    left_in_flick = rng.randint(2, 5)
+    for _ in range(notches):
+        left_in_flick -= 1
+        if left_in_flick <= 0:
+            gaps.append(rng.uniform(0.15, 0.45))
+            left_in_flick = rng.randint(2, 5)
+        else:
+            gaps.append(rng.uniform(0.02, 0.07))
+    return gaps

@@ -77,3 +77,37 @@ def test_glide_drives_callbacks_and_can_be_disabled(monkeypatch):
     assert not human_mouse.enabled()
     monkeypatch.setenv("WINDOWS_MCP_HUMAN_MOUSE", "1")
     assert human_mouse.enabled()
+
+
+def test_jitter_stays_within_limit_and_varies():
+    rng = random.Random(4)
+    pts = {human_mouse.jitter_point(500, 500, rng) for _ in range(300)}
+    assert len(pts) > 20
+    assert all(abs(x - 500) <= 4 and abs(y - 500) <= 4 for x, y in pts)
+    assert (500, 500) in pts or len(pts) > 30
+
+
+def test_click_hold_is_human_range():
+    rng = random.Random(5)
+    holds = [human_mouse.click_hold(rng) for _ in range(200)]
+    assert all(0.05 <= h <= 0.16 for h in holds)
+    assert max(holds) - min(holds) > 0.03
+
+
+def test_key_gaps_uneven_with_pauses_after_punctuation():
+    text = "hello world. this is a test, ok"
+    gaps = human_mouse.key_gaps(text, random.Random(6))
+    assert len(gaps) == len(text)
+    assert all(0.03 <= g <= 1.2 for g in gaps)
+    assert len({round(g, 3) for g in gaps}) > len(text) // 2
+    dot = text.index(".")
+    letters = [g for ch, g in zip(text, gaps) if ch.isalpha()]
+    assert gaps[dot] > sorted(letters)[len(letters) // 2]
+
+
+def test_scroll_gaps_come_in_flicks():
+    gaps = human_mouse.scroll_gaps(20, random.Random(8))
+    assert len(gaps) == 20
+    pauses = [g for g in gaps if g >= 0.15]
+    quick = [g for g in gaps if g < 0.08]
+    assert 3 <= len(pauses) <= 10 and len(quick) >= 10
