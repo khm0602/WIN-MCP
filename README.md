@@ -1,3 +1,7 @@
+> **WIN-MCP** is a Korean-localized fork of [CursorTouch/Windows-MCP](https://github.com/CursorTouch/Windows-MCP) (v0.8.9, MIT). It is not affiliated with or endorsed by the original authors. Korean install guide: [README_KO.md](README_KO.md)
+>
+> 이 저장소는 [CursorTouch/Windows-MCP](https://github.com/CursorTouch/Windows-MCP)의 한국어 포크예요. 원작자와 무관한 비공식 버전이고, 한국어 안내는 [README_KO.md](README_KO.md)를 보세요.
+
 <div align="center">
   <h1>🪟 Windows-MCP</h1>
 
