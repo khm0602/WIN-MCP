@@ -1,6 +1,6 @@
 [project]
-name = "windows-mcp"
-version = "0.8.9"
+name = "windows-mcp-ko"
+version = "0.8.9+ko.1"
 description = "Lightweight MCP Server for interacting with Windows Operating System."
 authors = [
     { name = "Jeomon George", email = "jeogeoalukka@gmail.com" }
@@ -51,7 +51,7 @@ Repository = "https://github.com/CursorTouch/Windows-MCP"
 Issues = "https://github.com/CursorTouch/Windows-MCP/issues"
 
 [project.scripts]
-windows-mcp = "windows_mcp.__main__:main"
+windows-mcp-ko = "windows_mcp.__main__:main"
 
 [build-system]
 requires = ["setuptools>=61"]

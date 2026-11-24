@@ -62,26 +62,26 @@ def _show(seconds: int) -> str:
     root.configure(padx=28, pady=22)
     root.protocol("WM_DELETE_WINDOW", lambda: finish("deny"))
     tk.Label(
-        root, text="AI is about to take control of this computer", font=("Segoe UI", 14, "bold")
+        root, text="AI가 이 컴퓨터 조작을 시작하려고 해요", font=("Malgun Gothic", 14, "bold")
     ).pack()
-    countdown = tk.Label(root, font=("Segoe UI", 11))
+    countdown = tk.Label(root, font=("Malgun Gothic", 11))
     countdown.pack(pady=(8, 2))
     tk.Label(
         root,
-        text="If you keep using the computer without answering, you stay in control.",
-        font=("Segoe UI", 9),
+        text="대답하지 않고 계속 컴퓨터를 쓰면 조작권은 그대로 나에게 있어요.",
+        font=("Malgun Gothic", 9),
         fg="#555555",
     ).pack(pady=(0, 14))
     buttons = tk.Frame(root)
     buttons.pack()
     # takefocus=0: answer by click only, so no key is still held when control begins.
-    for text, value in (("Allow now", "allow"), ("Deny", "deny")):
+    for text, value in (("지금 허용", "allow"), ("거부", "deny")):
         tk.Button(
             buttons,
             text=text,
             width=12,
             takefocus=0,
-            font=("Segoe UI", 10),
+            font=("Malgun Gothic", 10),
             command=lambda value=value: finish(value),
         ).pack(side="left", padx=8)
 
@@ -89,7 +89,7 @@ def _show(seconds: int) -> str:
         if left <= 0:
             finish("timeout")
             return
-        countdown.configure(text=f"Starting in {left} s")
+        countdown.configure(text=f"{left}초 뒤 시작")
         root.after(1000, tick, left - 1)
 
     tick(seconds)

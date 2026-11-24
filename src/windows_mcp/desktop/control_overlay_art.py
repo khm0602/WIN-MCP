@@ -8,7 +8,7 @@ from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
 
 from windows_mcp.desktop.overlay_bitmap import premultiplied_bgra
 
-_BORDER = 56
+_BORDER = 24
 _CURSOR_SIZE = 88
 _CURSOR_LABEL = "AI"
 _RIPPLE_SIZE = 96
@@ -17,10 +17,10 @@ _FONT_DIR = Path(os.environ.get("WINDIR", r"C:\Windows")) / "Fonts"
 _NOTICE_GLOW_PAD = 32
 _BREATH_PERIOD_SECONDS = 3.0
 _BREATH_MIN_ALPHA = 140
-_NOTICE_TITLE = "AI is controlling this computer"
+_NOTICE_TITLE = "AI가 이 PC를 조작 중이에요"
 _NOTICE_SHORTCUT = "Ctrl + Alt + Shift + Backspace"
-_NOTICE_MOUSE_HINT = "Move the mouse a significant distance"
-_NOTICE_HINT = f"or press {_NOTICE_SHORTCUT} to take over"
+_NOTICE_MOUSE_HINT = "마우스를 크게 움직이면 바로 넘겨받아요"
+_NOTICE_HINT = f"또는 {_NOTICE_SHORTCUT} 키로 넘겨받기"
 
 
 def _breath_opacity(elapsed: float) -> int:
@@ -84,7 +84,7 @@ def _cursor_bitmap(color: tuple[int, int, int]) -> bytes:
 def _draw_cursor_label(image: Image.Image, color: tuple[int, int, int]) -> None:
     """Tag the glow above and right of the hotspot, clear of the arrow body."""
     try:
-        font = ImageFont.truetype(str(_FONT_DIR / "seguisb.ttf"), 13)
+        font = ImageFont.truetype(str(_FONT_DIR / "malgunbd.ttf"), 13)
     except OSError:
         font = ImageFont.load_default()
     draw = ImageDraw.Draw(image)
@@ -154,8 +154,8 @@ def _notice_bitmap(screen_width: int) -> tuple[int, int, bytes] | None:
     # Prefer presentation-sized text, then shrink only when a monitor is narrow.
     for hint_size in range(24, 7, -1):
         try:
-            title_font = ImageFont.truetype(str(_FONT_DIR / "seguisb.ttf"), hint_size + 8)
-            hint_font = ImageFont.truetype(str(_FONT_DIR / "segoeui.ttf"), hint_size)
+            title_font = ImageFont.truetype(str(_FONT_DIR / "malgunbd.ttf"), hint_size + 8)
+            hint_font = ImageFont.truetype(str(_FONT_DIR / "malgun.ttf"), hint_size)
         except OSError:
             title_font = hint_font = ImageFont.load_default()
         measure = ImageDraw.Draw(Image.new("RGBA", (1, 1)))

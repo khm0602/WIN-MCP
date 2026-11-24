@@ -15,11 +15,11 @@ def _alpha_at(bgra: bytes, width: int, x: int, y: int) -> int:
     return bgra[(y * width + x) * 4 + 3]
 
 
-def test_notice_uses_clear_english_and_transparent_corners():
-    assert control_overlay_art._NOTICE_TITLE == "AI is controlling this computer"
-    assert control_overlay_art._NOTICE_MOUSE_HINT == "Move the mouse a significant distance"
+def test_notice_uses_clear_korean_and_transparent_corners():
+    assert control_overlay_art._NOTICE_TITLE == "AI가 이 PC를 조작 중이에요"
+    assert control_overlay_art._NOTICE_MOUSE_HINT == "마우스를 크게 움직이면 바로 넘겨받아요"
     assert (
-        control_overlay_art._NOTICE_HINT == "or press Ctrl + Alt + Shift + Backspace to take over"
+        control_overlay_art._NOTICE_HINT == "또는 Ctrl + Alt + Shift + Backspace 키로 넘겨받기"
     )
     assert control_overlay_art._NOTICE_SHORTCUT == "Ctrl + Alt + Shift + Backspace"
     notice = control_overlay_art._notice_bitmap(1920)
@@ -159,7 +159,7 @@ def test_layer_opacity_updates_only_on_change_and_fails_closed(monkeypatch):
 
 def test_edge_and_cursor_have_soft_glow_without_a_solid_contour():
     size = control_overlay_art._BORDER
-    assert size == 56  # The requested doubling of the former 28-pixel glow.
+    assert size == 24  # windows-mcp-ko: thinner edge than upstream 56.
     for side in ("left", "right", "top", "bottom"):
         width = size * 3 if side in ("top", "bottom") else size
         height = size if side in ("top", "bottom") else size * 3
@@ -176,8 +176,8 @@ def test_edge_and_cursor_have_soft_glow_without_a_solid_contour():
         assert alphas[0] == max(alphas) == 240  # Twice the previous edge opacity.
         assert alphas[-1] == 0
         assert all(a >= b for a, b in zip(alphas, alphas[1:]))
-        assert max(a - b for a, b in zip(alphas, alphas[1:])) <= 8
-        assert 30 <= alphas[40] <= 50  # The glow remains broad but fades inward.
+        assert max(a - b for a, b in zip(alphas, alphas[1:])) <= 240 * 2 // size
+        assert 0 < alphas[size * 5 // 7] < alphas[0] // 4  # Fades inward, still visible.
 
     glow = control_overlay_art._cursor_bitmap((45, 145, 255))
     width = control_overlay_art._CURSOR_SIZE
@@ -201,9 +201,9 @@ def test_corner_glow_joins_edges_without_double_opacity():
     assert _alpha_at(top, width, 0, 0) == control_overlay_art._glow_alpha(0)
     assert _alpha_at(top, width, width - 1, 0) == control_overlay_art._glow_alpha(0)
     for horizontal in (top, bottom):
-        for x_depth in (1, 5, 10, 20, 40, 55):
+        for x_depth in (1, 3, 6, 10, 16, 23):
             side_alpha = _alpha_at(left, border, x_depth, border // 2)
-            for y_depth in (1, 5, 10, 20, 40, 55):
+            for y_depth in (1, 3, 6, 10, 16, 23):
                 y = y_depth if horizontal is top else border - 1 - y_depth
                 straight_alpha = _alpha_at(horizontal, width, width // 2, y)
                 expected = control_overlay_art._glow_alpha(min(x_depth, y_depth))
