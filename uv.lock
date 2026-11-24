@@ -1813,7 +1813,7 @@ wheels = [
 ]
 
 [[package]]
-name = "windows-mcp-ko"
+name = "win-mcp"
 version = "0.8.9"
 source = { editable = "." }
 dependencies = [

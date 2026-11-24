@@ -1,5 +1,5 @@
 [project]
-name = "windows-mcp-ko"
+name = "win-mcp"
 version = "0.8.9"
 description = "Lightweight MCP Server for interacting with Windows Operating System."
 authors = [
@@ -51,7 +51,7 @@ Repository = "https://github.com/CursorTouch/Windows-MCP"
 Issues = "https://github.com/CursorTouch/Windows-MCP/issues"
 
 [project.scripts]
-windows-mcp-ko = "windows_mcp.__main__:main"
+win-mcp = "windows_mcp.__main__:main"
 # alias so existing configs pointing at windows-mcp.exe use this fork
 windows-mcp = "windows_mcp.__main__:main"
 

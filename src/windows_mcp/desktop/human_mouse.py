@@ -1,4 +1,4 @@
-"""Human-like cursor paths (windows-mcp-ko).
+"""Human-like cursor paths (WIN-MCP).
 
 Instead of teleporting or sliding along a ruler-straight line at constant
 speed, the cursor follows a gently curved path, accelerates and decelerates

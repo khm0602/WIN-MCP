@@ -1,4 +1,4 @@
-# WIN-MCP (windows-mcp-ko)
+# WIN-MCP
 
 [Windows-MCP](https://github.com/CursorTouch/Windows-MCP) 0.8.9 한국어 포크 (MIT).
 Claude Code가 내 PC 화면을 보고 마우스·키보드로 직접 조작하게 해 주는 MCP 서버.
@@ -12,14 +12,14 @@ Claude Code가 내 PC 화면을 보고 마우스·키보드로 직접 조작하�
 ```powershell
 # 1) uv
 powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
-# 2) 설치 (원본을 깔았다면 먼저: uv tool uninstall windows-mcp)
+# 2) 설치 (원본·옛 포크를 깔았다면 먼저: uv tool uninstall windows-mcp 또는 windows-mcp-ko)
 uv tool install git+https://github.com/khm0602/WIN-MCP
 # 3) Claude Code 등록 (끝의 serve 필수)
-claude mcp add WIN-MCP -s user -e ANONYMIZED_TELEMETRY=false -- "$env:USERPROFILE\.local\bin\windows-mcp-ko.exe" serve
+claude mcp add WIN-MCP -s user -e ANONYMIZED_TELEMETRY=false -- "$env:USERPROFILE\.local\bin\win-mcp.exe" serve
 ```
 Claude Code를 다시 켜고 `/mcp`에서 `WIN-MCP`가 connected인지 확인.
 
-업데이트: `uv tool upgrade windows-mcp-ko`
+업데이트: `uv tool upgrade win-mcp`
 
 ## 끄고 싶을 때 (환경변수)
 - `WINDOWS_MCP_HUMAN_MOUSE=0` — 사람 같은 입력 끄기 (원본처럼 빠르게)
