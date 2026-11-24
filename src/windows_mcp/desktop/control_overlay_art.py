@@ -8,7 +8,7 @@ from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
 
 from windows_mcp.desktop.overlay_bitmap import premultiplied_bgra
 
-_BORDER = 24
+_BORDER = 56
 _CURSOR_SIZE = 88
 _CURSOR_LABEL = "AI"
 _RIPPLE_SIZE = 96

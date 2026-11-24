@@ -14,6 +14,7 @@ from windows_mcp.tree.views import BoundingBox, TreeElementNode, TreeState, Sema
 from PIL import ImageFont, ImageDraw, Image
 from windows_mcp.tree.service import Tree, _excluded_process_names, _window_process_name
 from windows_mcp.desktop import screenshot as screenshot_capture
+from windows_mcp.desktop import human_mouse
 from windows_mcp.desktop.control import get_controller
 from windows_mcp.desktop import flash_overlay
 from windows_mcp.infrastructure import safe_get
@@ -804,6 +805,22 @@ class Desktop:
         except Exception:
             return ""
 
+    def _glide(self, x: int, y: int, duration: float | None = None, overshoot: bool = True) -> bool:
+        """Move the cursor to (x, y) like a hand would. Returns False when disabled."""
+        if not human_mouse.enabled():
+            return False
+        owner = get_controller()
+        human_mouse.glide(
+            uia.GetCursorPos(),
+            (x, y),
+            uia.SetCursorPos,
+            before_step=owner.checkpoint_current,
+            after_step=owner.record_step_current,
+            duration=duration,
+            allow_overshoot=overshoot,
+        )
+        return True
+
     def click(self, loc: tuple[int, int] | list[int], button: str = "left", clicks: int = 1) -> str:
         owner = get_controller()
         owner.checkpoint_current()
@@ -814,8 +831,10 @@ class Desktop:
         self._validate_screen_point(x, y)
         if clicks == 0:
             owner.checkpoint_current()
-            uia.SetCursorPos(x, y)
+            if not self._glide(x, y):
+                uia.SetCursorPos(x, y)
             return ""
+        self._glide(x, y)
         # Ask before clicking: a click that opens its own dialog must not look blocked.
         blocked = self._modal_dialog_warning(x, y)
         control_overlay.ripple(x, y)
@@ -1267,6 +1286,17 @@ class Desktop:
                 lambda: owner.physical_mouse_down("left"),
             )
             owner.record_step_current()
+            if human_mouse.enabled():
+                human_mouse.glide(
+                    (cx, cy),
+                    (x, y),
+                    uia.SetCursorPos,
+                    before_step=owner.checkpoint_current,
+                    after_step=owner.record_step_current,
+                    duration=effective_duration,
+                    allow_overshoot=False,
+                )
+                return {"start": [cx, cy], "end": [x, y], "duration": effective_duration}
             # Keep both the legacy drag and duration-based drag interruptible.
             steps = (
                 max(1, min(80, max(abs(x - cx), abs(y - cy)) // 20))
@@ -1291,6 +1321,8 @@ class Desktop:
         x, y = loc
         self._validate_screen_point(x, y)
         owner.checkpoint_current()
+        if self._glide(x, y):
+            return
         cx, cy = uia.GetCursorPos()
         steps = max(1, min(80, max(abs(x - cx), abs(y - cy)) // 20))
         for step in range(1, steps + 1):

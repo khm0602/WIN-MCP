@@ -159,7 +159,7 @@ def test_layer_opacity_updates_only_on_change_and_fails_closed(monkeypatch):
 
 def test_edge_and_cursor_have_soft_glow_without_a_solid_contour():
     size = control_overlay_art._BORDER
-    assert size == 24  # windows-mcp-ko: thinner edge than upstream 56.
+    assert size == 56  # The requested doubling of the former 28-pixel glow.
     for side in ("left", "right", "top", "bottom"):
         width = size * 3 if side in ("top", "bottom") else size
         height = size if side in ("top", "bottom") else size * 3
@@ -176,8 +176,8 @@ def test_edge_and_cursor_have_soft_glow_without_a_solid_contour():
         assert alphas[0] == max(alphas) == 240  # Twice the previous edge opacity.
         assert alphas[-1] == 0
         assert all(a >= b for a, b in zip(alphas, alphas[1:]))
-        assert max(a - b for a, b in zip(alphas, alphas[1:])) <= 240 * 2 // size
-        assert 0 < alphas[size * 5 // 7] < alphas[0] // 4  # Fades inward, still visible.
+        assert max(a - b for a, b in zip(alphas, alphas[1:])) <= 8
+        assert 30 <= alphas[40] <= 50  # The glow remains broad but fades inward.
 
     glow = control_overlay_art._cursor_bitmap((45, 145, 255))
     width = control_overlay_art._CURSOR_SIZE
@@ -201,9 +201,9 @@ def test_corner_glow_joins_edges_without_double_opacity():
     assert _alpha_at(top, width, 0, 0) == control_overlay_art._glow_alpha(0)
     assert _alpha_at(top, width, width - 1, 0) == control_overlay_art._glow_alpha(0)
     for horizontal in (top, bottom):
-        for x_depth in (1, 3, 6, 10, 16, 23):
+        for x_depth in (1, 5, 10, 20, 40, 55):
             side_alpha = _alpha_at(left, border, x_depth, border // 2)
-            for y_depth in (1, 3, 6, 10, 16, 23):
+            for y_depth in (1, 5, 10, 20, 40, 55):
                 y = y_depth if horizontal is top else border - 1 - y_depth
                 straight_alpha = _alpha_at(horizontal, width, width // 2, y)
                 expected = control_overlay_art._glow_alpha(min(x_depth, y_depth))

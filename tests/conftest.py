@@ -7,6 +7,9 @@ import pytest
 # can crash the interpreter. Tests for the flash itself set/clear this env var
 # explicitly via monkeypatch.
 os.environ.setdefault("WINDOWS_MCP_DISABLE_FLASH", "1")
+# windows-mcp-ko: upstream tests assert exact cursor calls; human-like motion has
+# its own tests in test_human_mouse.py.
+os.environ.setdefault("WINDOWS_MCP_HUMAN_MOUSE", "0")
 
 from windows_mcp.tree.views import BoundingBox, Center, TreeElementNode, ScrollElementNode
 from windows_mcp.desktop.views import Window, Status, DesktopState

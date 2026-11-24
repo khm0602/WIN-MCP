@@ -1,6 +1,6 @@
 [project]
 name = "windows-mcp-ko"
-version = "0.8.9+ko.1"
+version = "0.8.9"
 description = "Lightweight MCP Server for interacting with Windows Operating System."
 authors = [
     { name = "Jeomon George", email = "jeogeoalukka@gmail.com" }
@@ -52,6 +52,8 @@ Issues = "https://github.com/CursorTouch/Windows-MCP/issues"
 
 [project.scripts]
 windows-mcp-ko = "windows_mcp.__main__:main"
+# alias so existing configs pointing at windows-mcp.exe use this fork
+windows-mcp = "windows_mcp.__main__:main"
 
 [build-system]
 requires = ["setuptools>=61"]

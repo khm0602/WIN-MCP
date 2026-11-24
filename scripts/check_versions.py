@@ -40,7 +40,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 _UV_LOCK_WINDOWS_MCP = re.compile(
-    r'^\[\[package\]\]\nname = "windows-mcp"\nversion = "([^"]+)"',
+    r'^\[\[package\]\]\nname = "windows-mcp(?:-ko)?"\nversion = "([^"]+)"',
     re.MULTILINE,
 )
 
