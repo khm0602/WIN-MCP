@@ -98,7 +98,7 @@ def test_key_gaps_uneven_with_pauses_after_punctuation():
     text = "hello world. this is a test, ok"
     gaps = human_mouse.key_gaps(text, random.Random(6))
     assert len(gaps) == len(text)
-    assert all(0.012 <= g <= 0.45 for g in gaps)
+    assert all(0.006 <= g <= 0.3 for g in gaps)
     assert len({round(g, 3) for g in gaps}) > len(text) // 2
     dot = text.index(".")
     letters = [g for ch, g in zip(text, gaps) if ch.isalpha()]
@@ -108,7 +108,7 @@ def test_key_gaps_uneven_with_pauses_after_punctuation():
 def test_key_gaps_keep_typing_quick():
     text = "가나다라마바사 아자차카타파하 " * 7  # ~100 chars
     total = sum(human_mouse.key_gaps(text, random.Random(11)))
-    assert 2.0 <= total <= 6.0
+    assert 1.0 <= total <= 3.5
 
 
 def test_scroll_gaps_come_in_flicks():
